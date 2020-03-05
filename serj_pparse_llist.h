@@ -15,7 +15,6 @@ unparsed_obj* create_unparsed_object(void* data){
     last_unprs_obj->next = nullptr;
 }
 
-//go fuck yourself netbeans
 void init_unparsed_objects(){
     base_unprs_obj = new unparsed_obj;
     base_unprs_obj->object_data = nullptr;
