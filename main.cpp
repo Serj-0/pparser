@@ -7,8 +7,7 @@ using namespace serj;
 int main(){
     pparse_init();
     
-    pparse_object("w<423>{9999}");
-    cout << uncase("rr<78?3>bbbbe32t", '<', '>');
+    pparse_object("$<4,2,3>{9999}");
     
     pparse_exit();
 }

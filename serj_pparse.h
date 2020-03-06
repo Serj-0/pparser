@@ -23,7 +23,7 @@ void pparse_exit(){
 }
 
 //split string by delimiter
-vector<string> split(string& str, char delim){
+vector<string> split(string str, char delim){
     istringstream ist(str);
     string elem;
     vector<string> splits;
@@ -36,8 +36,21 @@ vector<string> split(string& str, char delim){
 //get string from within braces\n
 //e.g. "<content>" -> "content"
 string uncase(string str, char lbrace, char rbrace){
-    int li = str.find_first_of(lbrace);
-    return str.substr(li + 1, str.find_last_of(rbrace) - li - 1);
+//    int li = str.find_first_of(lbrace);
+    int fst = str.find_first_of(lbrace);
+    int lbrc = 0;
+    for(int i = fst + 1; i < str.size(); i++){
+        lbrc += (str[i] == lbrace) - (str[i] == rbrace);
+        if(lbrc < 0 && str[i] == rbrace){
+            return str.substr(fst + 1, i - fst - 1);
+        }
+    }
+    return str;
+//    return str.substr(li + 1, str.find_last_of(rbrace) - li - 1);
+}
+
+string trimcase(string str){
+    return str.substr(1, str.size() - 1);
 }
 
 //parse file data to usable object
@@ -47,8 +60,12 @@ void pparse_object(string data){
         return;
     }
     
-    int bsize = stoi(data.substr(2, data.length() - data.find_first_of(">", 2, data.length())));
-    cout << bsize;
+    vector<string> bsizedef = split(data.substr(2, data.length() - data.find_first_of(">", 2, data.length())), ',');
+    int bsize = 0;
+    for(int i = 0; i < bsizedef.size(); i++){
+        bsize += stoi(bsizedef[i]);
+    }
+    cout << bsize << endl;
 }
 
 }
