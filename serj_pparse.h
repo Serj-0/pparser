@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include "serj_pparse_llist.h"
+#include "serj_pparse_consts.h"
 
 #define PPARSE_ERR_HEAD "[PPARSE ERROR]: "
 #define PPARSE_LOG_ERR(x) std::cerr << PPARSE_ERR_HEAD << x
@@ -15,6 +16,7 @@ namespace serj{
 //prepare pparse for usage
 void pparse_init(){
     init_unparsed_objects();
+    init_datasizes();
 }
 
 //exit pparse

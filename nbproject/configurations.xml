@@ -5,6 +5,7 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse.h</itemPath>
+      <itemPath>C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse_consts.h</itemPath>
       <itemPath>C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse_llist.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -43,6 +44,11 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse_consts.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse_llist.h"
             ex="false"
             tool="3"
@@ -72,6 +78,11 @@
         </asmTool>
       </compileType>
       <item path="C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse_consts.h"
             ex="false"
             tool="3"
             flavor2="0">
