@@ -34,9 +34,8 @@ vector<string> split(string str, char delim){
 }
 
 //get string from within braces\n
-//e.g. "<content>" -> "content"
+//e.g. "{content}" -> "content"
 string uncase(string str, char lbrace, char rbrace){
-//    int li = str.find_first_of(lbrace);
     int fst = str.find_first_of(lbrace);
     int lbrc = 0;
     for(int i = fst + 1; i < str.size(); i++){
@@ -46,9 +45,9 @@ string uncase(string str, char lbrace, char rbrace){
         }
     }
     return str;
-//    return str.substr(li + 1, str.find_last_of(rbrace) - li - 1);
 }
 
+//cut first and last character from string
 string trimcase(string str){
     return str.substr(1, str.size() - 1);
 }
