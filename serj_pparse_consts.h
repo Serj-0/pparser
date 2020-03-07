@@ -25,15 +25,10 @@ map<string, int> pparse_type_bytesizes;
 void init_datasizes(){
     pair<string, int> a = {"str", 1};
     pparse_type_bytesizes.insert({
-        {"uchar", pparse_uchar_s},
         {"char", pparse_schar_s},
-        {"ushort", pparse_ushort_s},
         {"short", pparse_sshort_s},
-        {"uint", pparse_uint_s},
         {"int", pparse_sint_s},
-        {"ulong", pparse_ulong_s},
         {"long", pparse_slong_s},
-        {"udlong", pparse_udlong_s},
         {"dlong", pparse_sdlong_s},
         {"float", pparse_float_s},
         {"double", pparse_double_s},
@@ -41,19 +36,6 @@ void init_datasizes(){
 }
 
 }
-
-//#undef pparse_uchar_s
-//#undef pparse_schar_s
-//#undef pparse_ushort_s
-//#undef pparse_sshort_s
-//#undef pparse_uint_s
-//#undef pparse_sint_s
-//#undef pparse_ulong_s
-//#undef pparse_slong_s
-//#undef pparse_udlong_s
-//#undef pparse_sdlong_s
-//#undef pparse_float_s
-//#undef pparse_double_s
 
 #endif /* SERJ_PPARSE_CONSTS_H */
 

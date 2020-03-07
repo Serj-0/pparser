@@ -64,7 +64,11 @@ void pparse_object(string data){
     vector<string> bsizedef = split(data.substr(2, data.length() - data.find_first_of(">", 2, data.length())), ',');
     int bsize = 0;
     for(int i = 0; i < bsizedef.size(); i++){
-        bsize += stoi(bsizedef[i]);
+        if(isalpha(bsizedef[i][0])){
+            bsize += pparse_type_bytesizes[bsizedef[i]];
+        }else{
+            bsize += stoi(bsizedef[i]);
+        }
     }
     cout << bsize << endl;
 }
