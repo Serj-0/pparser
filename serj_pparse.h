@@ -5,12 +5,17 @@
 #include <vector>
 #include "serj_pparse_llist.h"
 #include "serj_pparse_consts.h"
+using namespace std;
 
 #define PPARSE_ERR_HEAD "[PPARSE ERROR]: "
 #define PPARSE_LOG_ERR(x) std::cerr << PPARSE_ERR_HEAD << x
 #define PPARSE_LOG_OBJ_ERR(x, y) std::cerr << PPARSE_ERR_HEAD << " obj: '" << x << "'\n\t\t" << y
-#define pparse_object_to(str, type, var) pparse_object(str); var = *static_cast<type*>(last_unprs_obj->object_data);
-using namespace std;
+
+//parse string data and place into target var
+#define pparse_object_to(str, type, var) pparse_object(str); var = *static_cast<type*>(last_unprs_obj->object_data)
+
+//cast last unparsed object to an object type
+#define cast_pparsed_object(type) *static_cast<type*>(last_unprs_obj->object_data)
 
 namespace serj{
 
@@ -63,7 +68,6 @@ void pparse_object(string data){
     }
     
     //get architecture of object
-//    vector<string> bsizedef = split(data.substr(2, data.length() - data.find_first_of(">", 2, data.length())), ',');
     vector<string> bsizedef = split(uncase(data, '<', '>'), ',');
 
     int bsize = 0;
@@ -76,7 +80,6 @@ void pparse_object(string data){
     }
     cout << "bsize: " << bsize << endl;
     
-//    char* objdata = static_cast<char*>(create_unparsed_object(bsize)->object_data);
     create_unparsed_object(bsize);
     char* objdata = static_cast<char*>(last_unprs_obj->object_data);
     
