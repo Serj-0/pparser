@@ -68,17 +68,22 @@ void pparse_object(string data){
     }
     
     //get architecture of object
-    vector<string> bsizedef = split(uncase(data, '<', '>'), ',');
+    vector<string> bsizedefstr = split(uncase(data, '<', '>'), ',');
+    vector<string> bsizedef;
 
     int bsize = 0;
-    for(int i = 0; i < bsizedef.size(); i++){
-        if(isalpha(bsizedef[i][0])){
-            bsize += pparse_type_bytesizes[bsizedef[i]];
+    for(int i = 0; i < bsizedefstr.size(); i++){
+        if(isalpha(bsizedefstr[i][0])){
+            vector<string> bsdfp = split(bsizedefstr[i], '_');
+            int ss = 1;
+            if(bsdfp.size() > 1) ss = stoi(bsdfp[1]);
+            bsize += pparse_type_bytesizes[bsdfp[0]] * ss;
+            bsizedef.insert(bsizedef.end(), ss, bsdfp[0]);
         }else{
-            bsize += stoi(bsizedef[i]);
+            bsize += stoi(bsizedefstr[i]);
         }
     }
-    cout << "bsize: " << bsize << endl;
+//    cout << "bsize: " << bsize << endl;
     
     create_unparsed_object(bsize);
     char* objdata = static_cast<char*>(last_unprs_obj->object_data);
@@ -88,23 +93,33 @@ void pparse_object(string data){
     vector<string> datas = split(data, ',');
     
     void* v = new char;
-    int s;
+    int s, rep;
     string sdfstr;
     
-    for(int i = 0; i < bsizedef.size(); i++){
-        cout << "PARSING '" << datas[i] << "'\n";
+    for(int i = 0; i < bsizedef.size();){
         delete static_cast<char*>(v);
         sdfstr = bsizedef[i];
-        s = pparse_type_bytesizes[sdfstr];
-        cout << sdfstr << " DATA POINT s:" << s << "\n";
-        v = new char[s];
-        pparse_typefuncs[sdfstr](datas[i], v);
-        cout << *static_cast<float*>(v) << endl;
-        for(int j = 0; j < s; j++){
-            cout << "\tByte " << j << " : " << static_cast<unsigned char*>(v)[j] + 0 << "\n";
-            *objdata = static_cast<char*>(v)[j];
-            objdata++;
+        
+        vector<string> dtsp = split(datas[i], '_');
+        string dato = dtsp[0];
+        if(dtsp.size() > 1){
+            rep = stoi(dtsp[1]);
+        }else{
+            rep = 1;
         }
+        
+        s = pparse_type_bytesizes[sdfstr];
+        v = new char[s];
+        //actual data parse
+        pparse_typefuncs[sdfstr](dato, v);
+        for(int rr = 0; rr < rep; rr++){
+            for(int j = 0; j < s; j++){
+                *objdata = static_cast<char*>(v)[j];
+                objdata++;
+            }
+        }
+        
+        i += rep;
     }
     
     delete static_cast<char*>(v);
