@@ -7,6 +7,7 @@ struct unparsed_obj{
     void* object_data;
     unparsed_obj* next;
 }*base_unprs_obj, *last_unprs_obj;
+int unpobj_list_size;
 
 //create new object of unparsed data
 unparsed_obj* create_unparsed_object(void* data){
@@ -14,6 +15,15 @@ unparsed_obj* create_unparsed_object(void* data){
     last_unprs_obj = last_unprs_obj->next;
     last_unprs_obj->object_data = data;
     last_unprs_obj->next = nullptr;
+    unpobj_list_size++;
+}
+
+unparsed_obj* create_unparsed_object(int bsize){
+    last_unprs_obj->next = new unparsed_obj;
+    last_unprs_obj = last_unprs_obj->next;
+    last_unprs_obj->object_data = new char[bsize];
+    last_unprs_obj->next = nullptr;
+    unpobj_list_size++;
 }
 
 //initialize unparsed objects linked list
@@ -22,6 +32,7 @@ void init_unparsed_objects(){
     base_unprs_obj->object_data = nullptr;
     base_unprs_obj->next = nullptr;
     last_unprs_obj = base_unprs_obj;
+    unpobj_list_size = 0;
 }
 
 //deallocate unparsed objects

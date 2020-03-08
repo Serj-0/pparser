@@ -9,6 +9,7 @@
 #define PPARSE_ERR_HEAD "[PPARSE ERROR]: "
 #define PPARSE_LOG_ERR(x) std::cerr << PPARSE_ERR_HEAD << x
 #define PPARSE_LOG_OBJ_ERR(x, y) std::cerr << PPARSE_ERR_HEAD << " obj: '" << x << "'\n\t\t" << y
+#define pparse_object_to(str, type, var) pparse_object(str); var = *static_cast<type*>(last_unprs_obj->object_data);
 using namespace std;
 
 namespace serj{
@@ -61,7 +62,10 @@ void pparse_object(string data){
         return;
     }
     
-    vector<string> bsizedef = split(data.substr(2, data.length() - data.find_first_of(">", 2, data.length())), ',');
+    //get architecture of object
+//    vector<string> bsizedef = split(data.substr(2, data.length() - data.find_first_of(">", 2, data.length())), ',');
+    vector<string> bsizedef = split(uncase(data, '<', '>'), ',');
+
     int bsize = 0;
     for(int i = 0; i < bsizedef.size(); i++){
         if(isalpha(bsizedef[i][0])){
@@ -70,7 +74,37 @@ void pparse_object(string data){
             bsize += stoi(bsizedef[i]);
         }
     }
-    cout << bsize << endl;
+    cout << "bsize: " << bsize << endl;
+    
+//    char* objdata = static_cast<char*>(create_unparsed_object(bsize)->object_data);
+    create_unparsed_object(bsize);
+    char* objdata = static_cast<char*>(last_unprs_obj->object_data);
+    
+    //strip outermost braces
+    data = uncase(data, '{', '}');
+    vector<string> datas = split(data, ',');
+    
+    void* v = new char;
+    int s;
+    string sdfstr;
+    
+    for(int i = 0; i < bsizedef.size(); i++){
+        cout << "PARSING '" << datas[i] << "'\n";
+        delete static_cast<char*>(v);
+        sdfstr = bsizedef[i];
+        s = pparse_type_bytesizes[sdfstr];
+        cout << sdfstr << " DATA POINT s:" << s << "\n";
+        v = new char[s];
+        pparse_typefuncs[sdfstr](datas[i], v);
+        cout << *static_cast<float*>(v) << endl;
+        for(int j = 0; j < s; j++){
+            cout << "\tByte " << j << " : " << static_cast<unsigned char*>(v)[j] + 0 << "\n";
+            *objdata = static_cast<char*>(v)[j];
+            objdata++;
+        }
+    }
+    
+    delete static_cast<char*>(v);
 }
 
 }
