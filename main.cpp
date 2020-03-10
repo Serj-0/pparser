@@ -11,13 +11,7 @@ struct int10{
 int main(){
     pparse_init();
 
-    pparse_object("$<int_3>{4_3}");
-    int10 a = cast_pparsed_object(int10);
-    
-    for (int i = 0; i < 10; i++) {
-        cout << a.arr[i] << endl;
-    }
-
+    pparse_file("yy.ppff");
     
     pparse_exit();
 }

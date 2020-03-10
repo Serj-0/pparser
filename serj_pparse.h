@@ -3,31 +3,32 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <fstream>
 #include "serj_pparse_llist.h"
 #include "serj_pparse_consts.h"
 using namespace std;
 
 #define PPARSE_ERR_HEAD "[PPARSE ERROR]: "
 #define PPARSE_LOG_ERR(x) std::cerr << PPARSE_ERR_HEAD << x
-#define PPARSE_LOG_OBJ_ERR(x, y) std::cerr << PPARSE_ERR_HEAD << " obj: '" << x << "'\n\t\t" << y
+#define PPARSE_LOG_OBJ_ERR(x, y) std::cerr << PPARSE_ERR_HEAD << " obj:  '" << x << "'\n\t\t" << y
 
 //parse string data and place into target var
 #define pparse_object_to(str, type, var) pparse_object(str); var = *static_cast<type*>(last_unprs_obj->object_data)
 
-//cast last unparsed object to an object type
-#define cast_pparsed_object(type) *static_cast<type*>(last_unprs_obj->object_data)
+//cast last uncasted object to an object type
+#define cast_pparsed_object(type) *static_cast<type*>(last_uncst_obj->object_data)
 
 namespace serj{
 
 //prepare pparse for usage
 void pparse_init(){
-    init_unparsed_objects();
+    init_uncasted_objects();
     init_datasizes();
 }
 
 //exit pparse
 void pparse_exit(){
-    destroy_unparsed_objects();
+    destroy_uncasted_objects();
 }
 
 //split string by delimiter
@@ -63,7 +64,7 @@ string trimcase(string str){
 //parse file data to usable object
 void pparse_object(string data){
     if(data[0] != '$'){
-        PPARSE_LOG_OBJ_ERR(data, " Invalid object initial character.\n");
+        PPARSE_LOG_OBJ_ERR(data, "Invalid object initial character.\n");
         return;
     }
     
@@ -85,8 +86,9 @@ void pparse_object(string data){
     }
 //    cout << "bsize: " << bsize << endl;
     
-    create_unparsed_object(bsize);
-    char* objdata = static_cast<char*>(last_unprs_obj->object_data);
+    create_uncasted_object(bsize);
+    last_uncst_obj->string_object = data;
+    char* objdata = static_cast<char*>(last_uncst_obj->object_data);
     
     //strip outermost braces
     data = uncase(data, '{', '}');
@@ -102,6 +104,7 @@ void pparse_object(string data){
         
         vector<string> dtsp = split(datas[i], '_');
         string dato = dtsp[0];
+        
         if(dtsp.size() > 1){
             rep = stoi(dtsp[1]);
         }else{
@@ -123,6 +126,61 @@ void pparse_object(string data){
     }
     
     delete static_cast<char*>(v);
+}
+
+void pparse_file(string path){
+    ifstream ist(path);
+    
+    string def, tp;
+    istringstream sstr;
+    stringbuf ostr("");
+    map<string,string> defs;
+    
+//    while(ist.peek() != '$'){
+//        getline(ist, def);
+//        sstr(def);
+//        
+//        getline(sstr, def, ' ');
+//        if(def == "typedef"){
+//            getline(sstr, tp, ' ');
+//            getline(sstr, def, ' ');
+//            defs.insert({tp, def});
+//            
+//            
+//        }
+//    }
+    
+    char c;
+    yeem:;
+    while(ist.peek() != '$'){ist.get();}
+    
+    int lb = 1;
+    
+    ist.get(ostr, '{');
+    ist.get(ostr);
+    
+    cout << ostr.str() << endl;
+    
+    do{
+        if(ist.peek() == '{'){
+            lb++;
+        }else if(ist.peek() == '}'){
+            lb--;
+        }
+        
+        cout << lb << endl;
+//        cout << (char)ist.peek() << endl;
+        
+        if(ist.peek() == ' ' || ist.peek() == '\n' || ist.peek() == '\t'){
+            ist.get();
+            continue;
+        }
+        ist.get(ostr);
+    }while(lb > 0);
+    
+    cout << ostr.str() << endl;
+    
+    ist.close();
 }
 
 }
