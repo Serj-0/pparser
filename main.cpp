@@ -4,19 +4,20 @@
 using namespace std;
 using namespace serj;
 
-struct box{
-    float x, y;
-    float w, h;
+struct int10{
+    int arr[10];
 };
 
 int main(){
     pparse_init();
+
+    pparse_object("$<int_3>{4_3}");
+    int10 a = cast_pparsed_object(int10);
     
-    pparse_object("$<float,float,float,float>{6.2,73.9,2.4,0.0099}");
-    box a = cast_pparsed_object(box);
-    
-    cout << a.x << endl << a.y << endl << a.w << endl << a.h << endl;
-    cout << a.x + a.y;
+    for (int i = 0; i < 10; i++) {
+        cout << a.arr[i] << endl;
+    }
+
     
     pparse_exit();
 }
