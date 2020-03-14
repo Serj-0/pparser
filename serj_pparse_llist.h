@@ -3,41 +3,43 @@
 namespace serj{
 
 //object created directly from file data
-struct unparsed_obj{
+struct uncasted_obj{
+    std::string string_object;
     void* object_data;
-    unparsed_obj* next;
-}*base_unprs_obj, *last_unprs_obj;
-int unpobj_list_size;
+    uncasted_obj* next;
+}*base_uncst_obj, *last_uncst_obj;
+int uncobj_list_size;
 
-//create new object of unparsed data
-unparsed_obj* create_unparsed_object(void* data){
-    last_unprs_obj->next = new unparsed_obj;
-    last_unprs_obj = last_unprs_obj->next;
-    last_unprs_obj->object_data = data;
-    last_unprs_obj->next = nullptr;
-    unpobj_list_size++;
+//create new object of uncasted data
+uncasted_obj* create_uncasted_object(void* data){
+    last_uncst_obj->next = new uncasted_obj;
+    last_uncst_obj = last_uncst_obj->next;
+    last_uncst_obj->object_data = data;
+    last_uncst_obj->next = nullptr;
+    uncobj_list_size++;
 }
 
-unparsed_obj* create_unparsed_object(int bsize){
-    last_unprs_obj->next = new unparsed_obj;
-    last_unprs_obj = last_unprs_obj->next;
-    last_unprs_obj->object_data = new char[bsize];
-    last_unprs_obj->next = nullptr;
-    unpobj_list_size++;
+//create new object of uncasted data with bsize bytes of memory
+uncasted_obj* create_uncasted_object(int bsize){
+    last_uncst_obj->next = new uncasted_obj;
+    last_uncst_obj = last_uncst_obj->next;
+    last_uncst_obj->object_data = new char[bsize];
+    last_uncst_obj->next = nullptr;
+    uncobj_list_size++;
 }
 
-//initialize unparsed objects linked list
-void init_unparsed_objects(){
-    base_unprs_obj = new unparsed_obj;
-    base_unprs_obj->object_data = nullptr;
-    base_unprs_obj->next = nullptr;
-    last_unprs_obj = base_unprs_obj;
-    unpobj_list_size = 0;
+//initialize uncasted objects linked list
+void init_uncasted_objects(){
+    base_uncst_obj = new uncasted_obj;
+    base_uncst_obj->object_data = nullptr;
+    base_uncst_obj->next = nullptr;
+    last_uncst_obj = base_uncst_obj;
+    uncobj_list_size = 0;
 }
 
-//deallocate unparsed objects
-void destroy_unparsed_objects(){
-    unparsed_obj* obj = base_unprs_obj, *nxt = nullptr;
+//deallocate uncasted objects
+void destroy_uncasted_objects(){
+    uncasted_obj* obj = base_uncst_obj, *nxt = nullptr;
     
     while(true){
         nxt = obj->next;
@@ -49,9 +51,9 @@ void destroy_unparsed_objects(){
     }
 }
 
-//get unparsed object by index
-unparsed_obj* get_unparsed_obj(int index){
-    unparsed_obj* obj = base_unprs_obj;
+//get uncasted object by index
+uncasted_obj* get_uncasted_obj(int index){
+    uncasted_obj* obj = base_uncst_obj;
     while(index-- > 0){
         if(!obj->next) return obj;
         obj = obj->next;
