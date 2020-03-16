@@ -104,10 +104,7 @@ void pparse_object(string data){
         
         vector<string> dtsp = split(datas[i], '_');
         string dato = dtsp[0];
-<<<<<<< HEAD
-=======
         
->>>>>>> 925d7e5281c62927c6ccf459b33b61f3a436ac4b
         if(dtsp.size() > 1){
             rep = stoi(dtsp[1]);
         }else{
@@ -134,54 +131,44 @@ void pparse_object(string data){
 void pparse_file(string path){
     ifstream ist(path);
     
-    string def, tp;
-    istringstream sstr;
-    stringbuf ostr("");
-    map<string,string> defs;
-    
-//    while(ist.peek() != '$'){
-//        getline(ist, def);
-//        sstr(def);
-//        
-//        getline(sstr, def, ' ');
-//        if(def == "typedef"){
-//            getline(sstr, tp, ' ');
-//            getline(sstr, def, ' ');
-//            defs.insert({tp, def});
-//            
-//            
-//        }
-//    }
+    ostringstream obj("");
     
     char c;
-    yeem:;
-    while(ist.peek() != '$'){ist.get();}
+    int lb = 0;
+    bool objective = false;
+    string strb;
     
-    int lb = 1;
-    
-    ist.get(ostr, '{');
-    ist.get(ostr);
-    
-    cout << ostr.str() << endl;
-    
-    do{
-        if(ist.peek() == '{'){
-            lb++;
-        }else if(ist.peek() == '}'){
-            lb--;
-        }
-        
-        cout << lb << endl;
-//        cout << (char)ist.peek() << endl;
-        
-        if(ist.peek() == ' ' || ist.peek() == '\n' || ist.peek() == '\t'){
-            ist.get();
+    while(ist >> c){
+        if(c == '$'){
+            objective = true;
+            obj << c;
+            getline(ist, strb, '{');
+//            cout << strb << endl;
+            obj << strb;
+            obj << '{';
+            ist >> c;
+            obj << c;
+            lb = 0;
+            continue;
+        }else if(c == ' ' || c == '\n' || c == '\t'){
             continue;
         }
-        ist.get(ostr);
-    }while(lb > 0);
-    
-    cout << ostr.str() << endl;
+        
+        if(objective){
+            if(c == '{'){
+                lb++;
+            }else if('}'){
+                lb--;
+            }
+            
+            obj << c;
+            if(lb == -1){
+                objective = false;
+                cout << obj.str();
+                obj = ostringstream("");
+            }
+        }
+    }
     
     ist.close();
 }
