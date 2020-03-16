@@ -4,16 +4,18 @@
 using namespace std;
 using namespace serj;
 
-struct int10{
-    int arr[10];
+struct fuck{
+    int a;
+    float b[3];
 };
 
 int main(){
     pparse_init();
 
     pparse_file("yy.ppff");
-
-//    pparse_file("yy.ppff");
+    
+    cout << last_uncst_obj->object_string << endl
+         << last_uncst_obj->object_label << endl;
     
     pparse_exit();
 }

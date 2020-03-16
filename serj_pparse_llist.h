@@ -4,7 +4,8 @@ namespace serj{
 
 //object created directly from file data
 struct uncasted_obj{
-    std::string string_object;
+    std::string object_string;
+    std::string object_label;
     void* object_data;
     uncasted_obj* next;
 }*base_uncst_obj, *last_uncst_obj;
@@ -35,6 +36,8 @@ void init_uncasted_objects(){
     base_uncst_obj->next = nullptr;
     last_uncst_obj = base_uncst_obj;
     uncobj_list_size = 0;
+    base_uncst_obj->object_string = "Uncasted Object List Base";
+    base_uncst_obj->object_label = "Uncasted Object List Base";
 }
 
 //deallocate uncasted objects

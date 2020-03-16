@@ -11,9 +11,8 @@ using namespace std;
 #define PPARSE_ERR_HEAD "[PPARSE ERROR]: "
 #define PPARSE_LOG_ERR(x) std::cerr << PPARSE_ERR_HEAD << x
 #define PPARSE_LOG_OBJ_ERR(x, y) std::cerr << PPARSE_ERR_HEAD << " obj:  '" << x << "'\n\t\t" << y
-
-//parse string data and place into target var
-#define pparse_object_to(str, type, var) pparse_object(str); var = *static_cast<type*>(last_unprs_obj->object_data)
+#define PPARSE_LOG_HEAD "[PPARSE LOG]: "
+#define PPARSE_LOG(x) std::cout << PPARSE_LOG_HEAD << x << endl
 
 //cast last uncasted object to an object type
 #define cast_pparsed_object(type) *static_cast<type*>(last_uncst_obj->object_data)
@@ -61,8 +60,8 @@ string trimcase(string str){
     return str.substr(1, str.size() - 1);
 }
 
-//parse file data to usable object
-void pparse_object(string data){
+//parse file data to usable objects
+void pparse_object(string data, string label = "No Label"){
     if(data[0] != '$'){
         PPARSE_LOG_OBJ_ERR(data, "Invalid object initial character.\n");
         return;
@@ -87,7 +86,9 @@ void pparse_object(string data){
 //    cout << "bsize: " << bsize << endl;
     
     create_uncasted_object(bsize);
-    last_uncst_obj->string_object = data;
+    last_uncst_obj->object_string = data;
+    last_uncst_obj->object_label = label;
+//    cout << data << " " << label << endl;
     char* objdata = static_cast<char*>(last_uncst_obj->object_data);
     
     //strip outermost braces
@@ -130,6 +131,8 @@ void pparse_object(string data){
 
 void pparse_file(string path){
     ifstream ist(path);
+    string label = "No Label";
+    string comment;
     
     ostringstream obj("");
     
@@ -143,28 +146,33 @@ void pparse_file(string path){
             objective = true;
             obj << c;
             getline(ist, strb, '{');
-//            cout << strb << endl;
             obj << strb;
             obj << '{';
-            ist >> c;
-            obj << c;
             lb = 0;
             continue;
         }else if(c == ' ' || c == '\n' || c == '\t'){
+            continue;
+        }else if(c == '?'){
+            getline(ist, label);
+            continue;
+        }else if(c == '#'){
+            getline(ist, comment);
+            PPARSE_LOG("File comment: '" << comment << "'");
             continue;
         }
         
         if(objective){
             if(c == '{'){
                 lb++;
-            }else if('}'){
+            }else if(c == '}'){
                 lb--;
             }
             
             obj << c;
             if(lb == -1){
                 objective = false;
-                cout << obj.str();
+                pparse_object(obj.str(), label);
+                label = "No Label";
                 obj = ostringstream("");
             }
         }
