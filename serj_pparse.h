@@ -12,7 +12,7 @@ using namespace std;
 #define PPARSE_LOG_ERR(x) std::cerr << PPARSE_ERR_HEAD << x
 #define PPARSE_LOG_OBJ_ERR(x, y) std::cerr << PPARSE_ERR_HEAD << " obj:  '" << x << "'\n\t\t" << y
 #define PPARSE_LOG_HEAD "[PPARSE LOG]: "
-#define PPARSE_LOG(x) std::cout << PPARSE_LOG_HEAD << x << endl
+#define PPARSE_LOG(x) std::cout << PPARSE_LOG_HEAD << x << std::endl
 
 //cast last uncasted object to an object type
 #define cast_pparsed_object(type) *static_cast<type*>(last_uncst_obj->object_data)
@@ -60,6 +60,34 @@ string trimcase(string str){
     return str.substr(1, str.size() - 1);
 }
 
+bool replace(string& target, string remove, string replace){
+    int spos = -1, ccount = 0, rsize = remove.size();
+    
+    for(int i = 0; i < target.size(); i++){
+        if(spos == -1 && target[i] == remove[0]){
+            spos = i;
+            ccount++;
+            continue;
+        }
+        
+        if(spos > -1){
+            if(target[i] == remove[ccount]){
+                ccount++;
+            }else{
+                spos = -1;
+                ccount = 0;
+                continue;
+            }
+        }
+        
+        if(ccount == rsize){
+            target.replace(spos, rsize, replace);
+            return true;
+        }
+    }
+    return false;
+}
+
 //parse file data to usable objects
 void pparse_object(string data, string label = "No Label"){
     if(data[0] != '$'){
@@ -96,14 +124,14 @@ void pparse_object(string data, string label = "No Label"){
     vector<string> datas = split(data, ',');
     
     void* v = new char;
-    int s, rep;
+    int s, rep, di = 0;
     string sdfstr;
     
-    for(int i = 0; i < bsizedef.size();){
+    for(int i = 0; i < bsizedef.size(); di++){
         delete static_cast<char*>(v);
         sdfstr = bsizedef[i];
         
-        vector<string> dtsp = split(datas[i], '_');
+        vector<string> dtsp = split(datas[di], '_');
         string dato = dtsp[0];
         
         if(dtsp.size() > 1){
@@ -111,7 +139,7 @@ void pparse_object(string data, string label = "No Label"){
         }else{
             rep = 1;
         }
-        
+
         s = pparse_type_bytesizes[sdfstr];
         v = new char[s];
         //actual data parse
@@ -169,7 +197,7 @@ void pparse_file(string path){
             getline(ist, def);
             keys.push_back(strb);
             tdefs.insert({strb, def});
-            cout << "typedef " << strb << " -> " << def << endl;
+            PPARSE_LOG("File text macro: " << strb << " -> " << def);
         }
         
         if(objective){
@@ -186,12 +214,7 @@ void pparse_file(string path){
                 
                 for(int i = 0; i < keys.size(); i++){
                     string dd = tdefs[keys[i]];
-                    int kpos;
-                    
-                    while(kpos = strb.find_first_of(keys[i].c_str()), kpos != string::npos){
-                        cout << "meme" << endl;
-                        strb.replace(kpos, keys[i].size(), dd);
-                    }
+                    while(replace(strb, keys[i], dd)){}
                 }
                 
                 pparse_object(strb, label);

@@ -5,8 +5,7 @@ using namespace std;
 using namespace serj;
 
 struct fuck{
-    int a;
-    float b[3];
+    unsigned int fuk;
 };
 
 int main(){
@@ -16,6 +15,8 @@ int main(){
     
     cout << last_uncst_obj->object_string << endl
          << last_uncst_obj->object_label << endl;
+    
+    
     
     pparse_exit();
 }
