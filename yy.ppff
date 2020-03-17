@@ -1,9 +1,8 @@
-?Testo Objectozzorzo
-$<int,float_3>{
-	4,
-#commento
-	5.6,2.5,2.6
-}
+#hitbox macro definition
+!hitbox float_4,float,uint_3
 
-?one numbo
-	$<int>{7}
+$<hitbox>{
+	0.0_4,
+	15.6,
+	120, 190, 190
+}

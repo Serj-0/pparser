@@ -140,6 +140,9 @@ void pparse_file(string path){
     int lb = 0;
     bool objective = false;
     string strb;
+
+    map<string, string> tdefs;
+    vector<string> keys;
     
     while(ist >> c){
         if(c == '$'){
@@ -159,6 +162,14 @@ void pparse_file(string path){
             getline(ist, comment);
             PPARSE_LOG("File comment: '" << comment << "'");
             continue;
+        }else if(c == '!'){
+            ist >> strb;
+            string def;
+            ist.ignore(1);
+            getline(ist, def);
+            keys.push_back(strb);
+            tdefs.insert({strb, def});
+            cout << "typedef " << strb << " -> " << def << endl;
         }
         
         if(objective){
@@ -171,7 +182,19 @@ void pparse_file(string path){
             obj << c;
             if(lb == -1){
                 objective = false;
-                pparse_object(obj.str(), label);
+                strb = obj.str();
+                
+                for(int i = 0; i < keys.size(); i++){
+                    string dd = tdefs[keys[i]];
+                    int kpos;
+                    
+                    while(kpos = strb.find_first_of(keys[i].c_str()), kpos != string::npos){
+                        cout << "meme" << endl;
+                        strb.replace(kpos, keys[i].size(), dd);
+                    }
+                }
+                
+                pparse_object(strb, label);
                 label = "No Label";
                 obj = ostringstream("");
             }
