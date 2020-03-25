@@ -64,6 +64,8 @@ uncasted_obj* get_uncasted_obj(int index){
     return obj;
 }
 
+//TODO add search by label function
+
 }
 
 #endif /* SERJ_PPARSE_LLIST_H */

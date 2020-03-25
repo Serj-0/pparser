@@ -23,6 +23,8 @@ using namespace std;
 
 namespace serj{
 
+map<char, const char*> pparse_escapes;
+
 void pparse_uchar(string& str, void* ptr){*static_cast<unsigned char*>(ptr) = stoi(str);}
 void pparse_ushort(string& str, void* ptr){*static_cast<unsigned short*>(ptr) = stoi(str);}
 void pparse_uint(string& str, void* ptr){*static_cast<unsigned int*>(ptr) = stoi(str);}
@@ -59,30 +61,16 @@ void pparse_rawchar(string& str, void* ptr){
     *static_cast<char*>(ptr) = c;
 }
 void pparse_stlstring(string& str, void* ptr){
-//    cout << "input string " << str << endl;
-    string copy = str;
-//    cout << "trimmed string " << trimmed << endl;
-    for(int i = 0; i < copy.size(); i++){
-//        cout << trimmed[i] << endl;
-        if(copy[i] == '\\'){
-            switch(copy[i + 1]){
-            case 'n':
-                copy.replace(i, 2, "\n");
-                break;
-            case 't':
-                copy.replace(i, 2, "\t");
-                break;
-            case '0':
-                copy.replace(i, 2, "\0");
-                break;
-            case '\\':
-                copy.replace(i, 2, "\\");
-                break;
+    for(int i = 0; i < str.size(); i++){
+        if(str[i] == '\\'){
+            const char* repl = pparse_escapes[str[i + 1]];
+            if(repl){
+                str.replace(i, 2, repl);
             }
         }
     }
     
-    *static_cast<string*>(ptr) = copy;
+    *static_cast<string*>(ptr) = str;
 }
 
 map<string, int> pparse_typesizes;
@@ -124,6 +112,16 @@ void init_datasizes(){
         {"ldouble", pparse_ldouble},
         {"rawchar", pparse_rawchar},
         {"string", pparse_stlstring},
+    });
+    
+    pparse_escapes.insert({
+        {'n', "\n"},
+        {'t', "\t"},
+        {'0', "\0"},
+        {'\\', "\\"},
+        {'"', "\""},
+        {'\n', " "},
+        {'\t', ""},
     });
 }
 

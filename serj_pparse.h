@@ -101,6 +101,7 @@ void pparse_object(string data, string label = "No Label"){
     delete static_cast<char*>(v);
 }
 
+//TODO add label automation for file parsing
 void pparse_file(string path){
     ifstream ist(path);
     string label = "No Label";

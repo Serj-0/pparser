@@ -15,7 +15,7 @@ int main(){
 
     pparse_file("yy.ppff");
     
-    fuck ab = pparse_cast(fuck);
+    fuck& ab = pparse_cast(fuck);
     cout << ab.a << endl;
     cout << ab.str << endl;
     cout << ab.c;
