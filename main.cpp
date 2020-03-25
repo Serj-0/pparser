@@ -5,7 +5,9 @@ using namespace std;
 using namespace serj;
 
 struct fuck{
-    unsigned int fuk;
+    long a;
+    string str;
+    char c;
 };
 
 int main(){
@@ -13,10 +15,10 @@ int main(){
 
     pparse_file("yy.ppff");
     
-    cout << last_uncst_obj->object_string << endl
-         << last_uncst_obj->object_label << endl;
-    
-    
+    fuck ab = pparse_cast(fuck);
+    cout << ab.a << endl;
+    cout << ab.str << endl;
+    cout << ab.c;
     
     pparse_exit();
 }

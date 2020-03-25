@@ -15,7 +15,7 @@ using namespace std;
 #define PPARSE_LOG(x) std::cout << PPARSE_LOG_HEAD << x << std::endl
 
 //cast last uncasted object to an object type
-#define cast_pparsed_object(type) *static_cast<type*>(last_uncst_obj->object_data)
+#define pparse_cast(type) *static_cast<type*>(last_uncst_obj->object_data)
 
 namespace serj{
 
@@ -28,64 +28,6 @@ void pparse_init(){
 //exit pparse
 void pparse_exit(){
     destroy_uncasted_objects();
-}
-
-//split string by delimiter
-vector<string> split(string str, char delim){
-    istringstream ist(str);
-    string elem;
-    vector<string> splits;
-    while(getline(ist, elem, delim)){
-        splits.push_back(elem);
-    }
-    return splits;
-}
-
-//get string from within braces\n
-//e.g. "{content}" -> "content"
-string uncase(string str, char lbrace, char rbrace){
-    int fst = str.find_first_of(lbrace);
-    int lbrc = 0;
-    for(int i = fst + 1; i < str.size(); i++){
-        lbrc += (str[i] == lbrace) - (str[i] == rbrace);
-        if(lbrc < 0 && str[i] == rbrace){
-            return str.substr(fst + 1, i - fst - 1);
-        }
-    }
-    return str;
-}
-
-//cut first and last character from string
-string trimcase(string str){
-    return str.substr(1, str.size() - 1);
-}
-
-bool replace(string& target, string remove, string replace){
-    int spos = -1, ccount = 0, rsize = remove.size();
-    
-    for(int i = 0; i < target.size(); i++){
-        if(spos == -1 && target[i] == remove[0]){
-            spos = i;
-            ccount++;
-            continue;
-        }
-        
-        if(spos > -1){
-            if(target[i] == remove[ccount]){
-                ccount++;
-            }else{
-                spos = -1;
-                ccount = 0;
-                continue;
-            }
-        }
-        
-        if(ccount == rsize){
-            target.replace(spos, rsize, replace);
-            return true;
-        }
-    }
-    return false;
 }
 
 //parse file data to usable objects
@@ -105,18 +47,16 @@ void pparse_object(string data, string label = "No Label"){
             vector<string> bsdfp = split(bsizedefstr[i], '_');
             int ss = 1;
             if(bsdfp.size() > 1) ss = stoi(bsdfp[1]);
-            bsize += pparse_type_bytesizes[bsdfp[0]] * ss;
+            bsize += pparse_typesizes[bsdfp[0]] * ss;
             bsizedef.insert(bsizedef.end(), ss, bsdfp[0]);
         }else{
             bsize += stoi(bsizedefstr[i]);
         }
     }
-//    cout << "bsize: " << bsize << endl;
     
     create_uncasted_object(bsize);
     last_uncst_obj->object_string = data;
     last_uncst_obj->object_label = label;
-//    cout << data << " " << label << endl;
     char* objdata = static_cast<char*>(last_uncst_obj->object_data);
     
     //strip outermost braces
@@ -140,8 +80,12 @@ void pparse_object(string data, string label = "No Label"){
             rep = 1;
         }
 
-        s = pparse_type_bytesizes[sdfstr];
-        v = new char[s];
+        s = pparse_typesizes[sdfstr];
+        if(sdfstr == "string"){
+            v = new string;
+        }else{
+            v = new char[s];
+        }
         //actual data parse
         pparse_typefuncs[sdfstr](dato, v);
         for(int rr = 0; rr < rep; rr++){
@@ -164,15 +108,16 @@ void pparse_file(string path){
     
     ostringstream obj("");
     
-    char c;
+    char c = 0, prevc;
     int lb = 0;
     bool objective = false;
     string strb;
 
     map<string, string> tdefs;
     vector<string> keys;
+    bool instr = false;
     
-    while(ist >> c){
+    while(prevc = c, ist.get(c)){
         if(c == '$'){
             objective = true;
             obj << c;
@@ -181,7 +126,10 @@ void pparse_file(string path){
             obj << '{';
             lb = 0;
             continue;
-        }else if(c == ' ' || c == '\n' || c == '\t'){
+        }else if(prevc != '\\' && c == '"'){
+            instr = !instr;
+            continue;
+        }else if(!instr && (c == ' ' || c == '\n' || c == '\t')){
             continue;
         }else if(c == '?'){
             getline(ist, label);

@@ -2,6 +2,7 @@
 #define SERJ_PPARSE_CONSTS_H
 #include <utility>
 #include <map>
+#include "serj_pparse_string.h"
 using namespace std;
 
 #define pparse_uchar_s sizeof(unsigned char)
@@ -17,6 +18,8 @@ using namespace std;
 #define pparse_float_s sizeof(float)
 #define pparse_double_s sizeof(double)
 #define pparse_ldouble_s sizeof(long double)
+#define pparse_rawchar_s sizeof(char)
+#define pparse_stlstring_s sizeof(string)
 
 namespace serj{
 
@@ -33,13 +36,61 @@ void pparse_sllong(string& str, void* ptr){*static_cast<signed long long*>(ptr) 
 void pparse_float(string& str, void* ptr){*static_cast<float*>(ptr) = stof(str);}
 void pparse_double(string& str, void* ptr){*static_cast<double*>(ptr) = stod(str);}
 void pparse_ldouble(string& str, void* ptr){*static_cast<long double*>(ptr) = stold(str);}
+void pparse_rawchar(string& str, void* ptr){
+    char c;
+    if(str[0] == '\\'){
+        switch(str[1]){
+        case 'n':
+            c = '\n';
+            break;
+        case 't':
+            c = '\t';
+            break;
+        case '0':
+            c = '\0';
+            break;
+        case '\\':
+                c = '\\';
+            break;
+        }
+    }else{
+        c = str[0];
+    }
+    *static_cast<char*>(ptr) = c;
+}
+void pparse_stlstring(string& str, void* ptr){
+//    cout << "input string " << str << endl;
+    string copy = str;
+//    cout << "trimmed string " << trimmed << endl;
+    for(int i = 0; i < copy.size(); i++){
+//        cout << trimmed[i] << endl;
+        if(copy[i] == '\\'){
+            switch(copy[i + 1]){
+            case 'n':
+                copy.replace(i, 2, "\n");
+                break;
+            case 't':
+                copy.replace(i, 2, "\t");
+                break;
+            case '0':
+                copy.replace(i, 2, "\0");
+                break;
+            case '\\':
+                copy.replace(i, 2, "\\");
+                break;
+            }
+        }
+    }
+    
+    *static_cast<string*>(ptr) = copy;
+}
 
-map<string, int> pparse_type_bytesizes;
+map<string, int> pparse_typesizes;
 map<string, void(*)(string&, void*)> pparse_typefuncs;
 
 //initalize a map of type names and their byte sizes
 void init_datasizes(){
-    pparse_type_bytesizes.insert({
+    pparse_typesizes.insert({
         {"uchar", pparse_uchar_s},
         {"ushort", pparse_ushort_s},
         {"uint", pparse_uint_s},
@@ -53,6 +104,8 @@ void init_datasizes(){
         {"float", pparse_float_s},
         {"double", pparse_double_s},
         {"ldouble", pparse_ldouble_s},
+        {"rawchar", pparse_rawchar_s},
+        {"string", pparse_stlstring_s},
     });
     
     pparse_typefuncs.insert({
@@ -69,6 +122,8 @@ void init_datasizes(){
         {"float", pparse_float},
         {"double", pparse_double},
         {"ldouble", pparse_ldouble},
+        {"rawchar", pparse_rawchar},
+        {"string", pparse_stlstring},
     });
 }
 

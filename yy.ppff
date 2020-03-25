@@ -1,8 +1,7 @@
-#hitbox macro definition
-!hitbox float_4,float,uint_3
-
-$<hitbox>{
-	0.0_4,
-	15.6,
-	120, 190, 190
+$<long,string,rawchar>{
+32236,
+"Guys I'm shaking. I'm FUCKING shaking right now.
+	I've never wanted to breed anything more than I want to breed Isabelle.
+f's in the chat bois.",
+p
 }

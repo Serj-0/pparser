@@ -7,6 +7,7 @@
       <itemPath>C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse.h</itemPath>
       <itemPath>C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse_consts.h</itemPath>
       <itemPath>C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse_llist.h</itemPath>
+      <itemPath>C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse_string.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -54,6 +55,11 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse_string.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
@@ -88,6 +94,11 @@
             flavor2="0">
       </item>
       <item path="C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse_llist.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/George/Documents/NetBeansProjects/pparser/serj_pparse_string.h"
             ex="false"
             tool="3"
             flavor2="0">
