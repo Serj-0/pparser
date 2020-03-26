@@ -1,1 +1,8 @@
-build/Debug
+build/*
+dist/*
+nbproject/*
+*.cpp
+Makefile
+yy.ppff
+.dep.inc
+.gitignore
