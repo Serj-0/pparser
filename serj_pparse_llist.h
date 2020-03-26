@@ -3,6 +3,7 @@
 namespace serj{
 
 //object created directly from file data
+//TODO add data type counter to uncasted object
 struct uncasted_obj{
     std::string object_string;
     std::string object_label;
