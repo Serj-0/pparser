@@ -1,5 +1,4 @@
 build/*
-<<<<<<< HEAD
 dist/*
 nbproject/*
 *.cpp
@@ -7,11 +6,3 @@ Makefile
 yy.ppff
 .dep.inc
 .gitignore
-=======
-*.cpp
-Makefile
-dist/*
-yy.ppff
-.dep.inc
-nbproject/*
->>>>>>> 8d918c0e31c84f73ef348507ea5f3ec53b2f562a

@@ -3,11 +3,7 @@
 namespace serj{
 
 //object created directly from file data
-<<<<<<< HEAD
-//TODO add data type counter to uncasted object
-=======
 //TODO add data counter to return number of instances of certain type within an object?
->>>>>>> 8d918c0e31c84f73ef348507ea5f3ec53b2f562a
 struct uncasted_obj{
     std::string object_string;
     std::string object_label;
