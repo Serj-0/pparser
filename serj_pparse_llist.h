@@ -1,16 +1,19 @@
 #ifndef SERJ_PPARSE_LLIST_H
 #define SERJ_PPARSE_LLIST_H
+#include <map>
+
 namespace serj{
+using namespace std;
 
 //object created directly from file data
-//TODO add data counter to return number of instances of certain type within an object?
 struct uncasted_obj{
-    std::string object_string;
-    std::string object_label;
+    string object_string;
+    string object_label;
+    map<string, int> object_data_counts;
     void* object_data;
     uncasted_obj* next;
 }*base_uncst_obj, *last_uncst_obj;
-int uncobj_list_size;
+int pparse_uncasted_obj_count;
 
 //create new object of uncasted data
 uncasted_obj* create_uncasted_object(void* data){
@@ -18,7 +21,7 @@ uncasted_obj* create_uncasted_object(void* data){
     last_uncst_obj = last_uncst_obj->next;
     last_uncst_obj->object_data = data;
     last_uncst_obj->next = nullptr;
-    uncobj_list_size++;
+    pparse_uncasted_obj_count++;
 }
 
 //create new object of uncasted data with bsize bytes of memory
@@ -27,7 +30,7 @@ uncasted_obj* create_uncasted_object(int bsize){
     last_uncst_obj = last_uncst_obj->next;
     last_uncst_obj->object_data = new char[bsize];
     last_uncst_obj->next = nullptr;
-    uncobj_list_size++;
+    pparse_uncasted_obj_count++;
 }
 
 //initialize uncasted objects linked list
@@ -36,7 +39,7 @@ void init_uncasted_objects(){
     base_uncst_obj->object_data = nullptr;
     base_uncst_obj->next = nullptr;
     last_uncst_obj = base_uncst_obj;
-    uncobj_list_size = 0;
+    pparse_uncasted_obj_count = 0;
     base_uncst_obj->object_string = "Uncasted Object List Base";
     base_uncst_obj->object_label = "Uncasted Object List Base";
 }
@@ -48,7 +51,7 @@ void destroy_uncasted_objects(){
     while(true){
         nxt = obj->next;
         delete static_cast<char*>(obj->object_data);
-//        std::cout << "DELETING " << obj << std::endl;
+//        cout << "DELETING " << obj << endl;
         delete obj;
         if(!nxt) break;
         obj = nxt;
@@ -65,7 +68,17 @@ uncasted_obj* get_uncasted_obj(int index){
     return obj;
 }
 
-//TODO add search by label function
+//return uncasted object by label
+uncasted_obj* get_uncasted_obj(string label){
+    uncasted_obj* obj = base_uncst_obj;
+    do{
+        obj = obj->next;
+        if(obj->object_label == label){
+            return obj;
+        }
+    }while(obj->next);
+    return nullptr;
+}
 
 }
 

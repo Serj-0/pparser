@@ -3,7 +3,6 @@
 #include <utility>
 #include <map>
 #include "serj_pparse_string.h"
-using namespace std;
 
 #define pparse_uchar_s sizeof(unsigned char)
 #define pparse_schar_s sizeof(signed char)
@@ -22,6 +21,7 @@ using namespace std;
 #define pparse_stlstring_s sizeof(string)
 
 namespace serj{
+using namespace std;
 
 map<char, const char*> pparse_escapes;
 
@@ -73,11 +73,21 @@ void pparse_stlstring(string& str, void* ptr){
     *static_cast<string*>(ptr) = str;
 }
 
+enum pparse_label_operation{
+    PPARSE_LOP_NONE = -1,
+    PPARSE_LOP_COUNT = 0,
+};
+
 map<string, int> pparse_typesizes;
 map<string, void(*)(string&, void*)> pparse_typefuncs;
+map<char, int> pparse_label_operations;
 
 //initalize a map of type names and their byte sizes
 void init_datasizes(){
+    pparse_label_operations.insert({
+        {'n', PPARSE_LOP_COUNT},
+    });
+    
     pparse_typesizes.insert({
         {"uchar", pparse_uchar_s},
         {"ushort", pparse_ushort_s},

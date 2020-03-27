@@ -17,6 +17,8 @@ using namespace std;
 //cast last uncasted object to an object type
 #define pparse_cast(type) *static_cast<type*>(last_uncst_obj->object_data)
 
+#define pparse_cast_obj_ptr(type, ptr) *static_cast<type*>(ptr->object_data)
+
 namespace serj{
 
 //prepare pparse for usage
@@ -30,8 +32,9 @@ void pparse_exit(){
     destroy_uncasted_objects();
 }
 
+//TODO add vector declaration support
 //parse file data to usable objects
-void pparse_object(string data, string label = "No Label"){
+void pparse_object(string data, string label = ""){
     if(data[0] != '$'){
         PPARSE_LOG_OBJ_ERR(data, "Invalid object initial character.\n");
         return;
@@ -41,22 +44,31 @@ void pparse_object(string data, string label = "No Label"){
     vector<string> bsizedefstr = split(uncase(data, '<', '>'), ',');
     vector<string> bsizedef;
 
+    map<string, int> datacounts;
+    
     int bsize = 0;
     for(int i = 0; i < bsizedefstr.size(); i++){
+        int ss = 1;
+        string deftype;
+
         if(isalpha(bsizedefstr[i][0])){
             vector<string> bsdfp = split(bsizedefstr[i], '_');
-            int ss = 1;
+            deftype = bsdfp[0];
             if(bsdfp.size() > 1) ss = stoi(bsdfp[1]);
             bsize += pparse_typesizes[bsdfp[0]] * ss;
             bsizedef.insert(bsizedef.end(), ss, bsdfp[0]);
         }else{
+            deftype = bsizedefstr[i];
             bsize += stoi(bsizedefstr[i]);
         }
+
+        datacounts[deftype] += ss;
     }
     
     create_uncasted_object(bsize);
     last_uncst_obj->object_string = data;
     last_uncst_obj->object_label = label;
+    last_uncst_obj->object_data_counts = datacounts;
     char* objdata = static_cast<char*>(last_uncst_obj->object_data);
     
     //strip outermost braces
@@ -101,10 +113,39 @@ void pparse_object(string data, string label = "No Label"){
     delete static_cast<char*>(v);
 }
 
-//TODO add label automation for file parsing
+struct pparse_label_behavior{
+    string str;
+    int operation;
+};
+
+map<string, int> pparse_file_obj_counts;
+
+void pparse_generate_label(string tdef, vector<pparse_label_behavior>& bhevs, uncasted_obj* obj){
+    string label = "";
+    
+    for(int i = 0; i < bhevs.size(); i++){
+        if(!bhevs[i].str.empty()){
+            label.append(bhevs[i].str);
+        }else{
+            switch(bhevs[i].operation){
+            case PPARSE_LOP_COUNT:
+                label.append(to_string(pparse_file_obj_counts[tdef] - 1));
+                break;
+            }
+        }
+    }
+    
+    if(label.empty()) label = "No Label";
+//    return label;
+    obj->object_label = label;
+}
+
+//TODO add more features to label automation
 void pparse_file(string path){
+    pparse_file_obj_counts.clear();
+    
     ifstream ist(path);
-    string label = "No Label";
+    string label = "";
     string comment;
     
     ostringstream obj("");
@@ -117,6 +158,7 @@ void pparse_file(string path){
     map<string, string> tdefs;
     vector<string> keys;
     bool instr = false;
+    map<string, vector<pparse_label_behavior>> labelsystems;
     
     while(prevc = c, ist.get(c)){
         if(c == '$'){
@@ -141,12 +183,52 @@ void pparse_file(string path){
             continue;
         }else if(c == '!'){
             ist >> strb;
-            string def;
-            ist.ignore(1);
-            getline(ist, def);
-            keys.push_back(strb);
-            tdefs.insert({strb, def});
-            PPARSE_LOG("File text macro: " << strb << " -> " << def);
+            if(strb == "macro"){
+                ist >> strb;
+                string def;
+                ist.ignore(1);
+                getline(ist, def);
+                keys.push_back(strb);
+                tdefs.insert({strb, def});
+                PPARSE_LOG("File text macro: " << strb << " -> " << def);
+            }else if(strb == "label"){
+                //type to be labelled
+                ist >> strb;
+                if(!tdefs[strb].empty()) strb = tdefs[strb];
+                
+                string labelsys;
+                ist.ignore(1);
+                getline(ist, labelsys);
+                /*
+                 * !label box "box%n"
+                 * 
+                 * label each object with type box the current box bount
+                 * box0, box1 ...etc
+                 */
+                labelsys = trimcase(labelsys);
+                string lbfr = "";
+                
+                //iterate label system defition char by char
+                for(int i = 0; i < labelsys.size(); i++){
+                    switch(labelsys[i]){
+                    case '%':
+                        if(!lbfr.empty()){
+                            labelsystems[strb].push_back({lbfr, PPARSE_LOP_NONE});
+                            lbfr.clear();
+                        }
+                        labelsystems[strb].push_back({"", pparse_label_operations[labelsys[i + 1]]});
+                        i++;
+                        break;
+                    default:
+                        lbfr.push_back(labelsys[i]);
+                        break;
+                    }
+                }
+                if(!lbfr.empty()){
+                    labelsystems[strb].push_back({lbfr, PPARSE_LOP_NONE});
+                }
+                //
+            }
         }
         
         if(objective){
@@ -166,8 +248,16 @@ void pparse_file(string path){
                     while(replace(strb, keys[i], dd)){}
                 }
                 
-                pparse_object(strb, label);
-                label = "No Label";
+                pparse_object(strb);
+                string tdef = uncase(last_uncst_obj->object_string, '<', '>');
+                pparse_file_obj_counts[tdef]++;
+                
+                if(!label.empty()){
+                    last_uncst_obj->object_label = label;
+                    label.clear();
+                }else{
+                    pparse_generate_label(tdef, labelsystems[tdef], last_uncst_obj);
+                }
                 obj = ostringstream("");
             }
         }
